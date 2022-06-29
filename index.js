@@ -4,12 +4,17 @@
 const express = require('express')
 const jwt = require('jsonwebtoken')
 const dataService = require('./services/data.service')
+const cors = require('cors')
 
 
 
 // create server app
 
 const app = express()
+
+app.use(cors({
+    origin:'http://localhost:4200'
+}))
 
 // parse json
 
@@ -45,36 +50,38 @@ const jwtMiddleware = (req, res, next) => {
 // register api
 app.post('/register', (req, res) => {
     // resolve register here
-    const result = dataService.register(req.body.username, req.body.acno, req.body.password)
-    res.status(result.statusCode).json(result)
+    dataService.register(req.body.username, req.body.acno, req.body.password)
+        .then( result => { res.status(result.statusCode).json(result) } )  
 })
 
 // login
 
 app.post('/login', (req,res) => {
-    const result = dataService.login(req.body.acno, req.body.pswd)
-    res.status(result.statusCode).json(result)
+    dataService.login(req.body.acno, req.body.pswd)
+        .then(result => { res.status(result.statusCode).json(result) })
 })
 
 // deposit
 
 app.post('/deposit',jwtMiddleware, (req,res) => {
-    const result = dataService.deposit(req.body.acno, req.body.pswd, req.body.amt)
-    res.status(result.statusCode).json(result)
+    dataService.deposit(req.body.acno, req.body.pswd, req.body.amt)
+        .then( result => { res.status(result.statusCode).json(result) })
+    
 })
 
 // withdraw
 
 app.post('/withdraw',jwtMiddleware, (req,res) => {
-    const result = dataService.withdraw(req.body.acno, req.body.pswd, req.body.amt)
-    res.status(result.statusCode).json(result)
+    dataService.withdraw(req.body.acno, req.body.pswd, req.body.amt)
+        .then(result => { res.status(result.statusCode).json(result) })
+    
 })
 
 // transaction
 
 app.post('/transaction',jwtMiddleware, (req,res) => {
-    const result = dataService.getTransaction(req.body.acno)
-    res.status(result.statusCode).json(result)
+    dataService.getTransaction(req.body.acno)
+        .then( result => { res.status(result.statusCode).json(result) })
 })
 
 // setup a port number
